@@ -6,6 +6,13 @@ import { useAdmin } from '../../context/AdminContext';
 const Hero = () => {
     const { dailyMenu } = useAdmin();
 
+    const scrollToSection = (id) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
     return (
         <section className="relative min-h-screen flex items-center justify-center py-20 overflow-hidden">
             <div className="container mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
@@ -48,10 +55,19 @@ const Hero = () => {
                         transition={{ delay: 0.6, duration: 0.8 }}
                         className="flex flex-col sm:flex-row items-center gap-6 justify-center lg:justify-start"
                     >
-                        <Button size="lg" className="bg-primary-500 hover:bg-primary-600 text-white border-none px-10 text-lg w-full sm:w-auto font-bold shadow-xl shadow-primary-500/20 hover:shadow-primary-500/30 hover:-translate-y-1">
+                        <Button
+                            size="lg"
+                            onClick={() => scrollToSection('menu')}
+                            className="bg-primary-500 hover:bg-primary-600 text-white border-none px-10 text-lg w-full sm:w-auto font-bold shadow-xl shadow-primary-500/20 hover:shadow-primary-500/30 hover:-translate-y-1"
+                        >
                             View Menu <ArrowRight className="ml-2 w-5 h-5" />
                         </Button>
-                        <Button size="lg" variant="outline" className="border-2 border-dark-200 hover:border-dark-300 text-dark-700 hover:bg-white w-full sm:w-auto font-bold hover:text-dark-900">
+                        <Button
+                            size="lg"
+                            variant="outline"
+                            onClick={() => scrollToSection('plans')}
+                            className="border-2 border-dark-200 hover:border-dark-300 text-dark-700 hover:bg-white w-full sm:w-auto font-bold hover:text-dark-900"
+                        >
                             Our Plans
                         </Button>
                     </motion.div>

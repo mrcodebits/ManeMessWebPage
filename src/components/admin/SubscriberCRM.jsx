@@ -42,7 +42,28 @@ const SubscriberCRM = () => {
         return true;
     });
 
-    // ... handlers ...
+    const handleAddMember = (e) => {
+        e.preventDefault();
+        addSubscriber(newMember);
+        setIsAddModalOpen(false);
+        setNewMember({ name: '', phone: '', planId: PLAN_TYPES.FULL_TIFFIN_1M.id });
+        alert('Member Added Successfully!');
+    };
+
+    const openRenewModal = (sub) => {
+        setSelectedSubscriber(sub);
+        setNewPlanForRenewal(sub.planId || PLAN_TYPES.FULL_TIFFIN_1M.id);
+        setIsRenewModalOpen(true);
+    };
+
+    const handleRenewSubmit = (e) => {
+        e.preventDefault();
+        if (!selectedSubscriber) return;
+        renewSubscription(selectedSubscriber.id, newPlanForRenewal);
+        setIsRenewModalOpen(false);
+        setSelectedSubscriber(null);
+        alert('Plan Renewed/Updated Successfully');
+    };
 
     return (
         <div className="space-y-4 md:space-y-6 pb-20 md:pb-0"> {/* added padding bottom for mobile nav likely */}
@@ -62,8 +83,8 @@ const SubscriberCRM = () => {
 
             {/* Modals ... */}
             {isAddModalOpen && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center p-0 md:p-4">
-                    <div className="bg-white p-6 md:p-8 rounded-t-3xl md:rounded-2xl w-full max-w-md shadow-2xl animate-in slide-in-from-bottom md:zoom-in duration-200">
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center p-0 md:p-4 transition-opacity">
+                    <div className="bg-white p-6 md:p-8 rounded-t-3xl md:rounded-2xl w-full max-w-md shadow-2xl transform transition-transform duration-200 ease-in-out md:scale-100 scale-100">
                         <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6 md:hidden" /> {/* Mobile handle */}
                         <h3 className="text-xl font-bold mb-6">Register New Member</h3>
                         <form onSubmit={handleAddMember} className="space-y-4">

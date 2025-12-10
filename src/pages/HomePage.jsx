@@ -7,6 +7,7 @@ import WeeklyMenu from '../components/sections/WeeklyMenu';
 import PricingPlans from '../components/sections/PricingPlans';
 import AboutSection from '../components/sections/AboutSection';
 import ContactSection from '../components/sections/ContactSection';
+import TestimonialsSection from '../components/sections/TestimonialsSection';
 import SEO from '../components/layout/SEO';
 import VideoTour from '../components/sections/VideoTour';
 
@@ -15,6 +16,7 @@ const HomePage = () => {
         <div>
             <SEO title="Home" description="Mane Mess - Premium Homemade Tiffin Service in Pune." />
             <Hero />
+            {/* Reverting to vertical stack as per user request */}
             <DailySpecial />
             <FeaturesSection />
             <VideoTour />
@@ -22,7 +24,9 @@ const HomePage = () => {
             <FestiveSpecials />
             <WeeklyMenu />
             <PricingPlans />
+            <TestimonialsSection />
             <AboutSection />
+
             <ContactSection />
         </div>
     );
