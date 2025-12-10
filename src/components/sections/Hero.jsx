@@ -1,104 +1,152 @@
 import { motion } from 'framer-motion';
 import Button from '../ui/Button';
-import { ArrowRight, CheckCircle } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { useAdmin } from '../../context/AdminContext';
 
 const Hero = () => {
+    const { dailyMenu } = useAdmin();
+
     return (
-        <section className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-primary-50">
+        <section className="relative min-h-screen flex items-center justify-center py-20 overflow-hidden">
+            <div className="container mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
 
-            {/* Video Background */}
-            <div className="absolute inset-0 z-0">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary-50/95 via-primary-50/80 to-white/70 z-10" />
-                <div className="absolute inset-0 bg-primary-500/10 mix-blend-overlay z-10" />
-                <video
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="w-full h-full object-cover opacity-80"
-                    poster="https://images.unsplash.com/photo-1596797038530-2c107229654b?q=80&w=2000&auto=format&fit=crop"
+                {/* Left Content */}
+                <motion.div
+                    initial={{ opacity: 0, x: -50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    className="space-y-8 text-center lg:text-left"
                 >
-                    <source src="https://cdn.coverr.co/videos/coverr-preparing-indian-food-5254/1080p.mp4" type="video/mp4" />
-                    Your browser does not support the video tag.
-                </video>
-            </div>
-
-            <div className="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center relative z-20">
-
-                {/* Text Content */}
-                <div className="max-w-2xl">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
+                        transition={{ delay: 0.2, duration: 0.8 }}
                     >
-                        <span className="inline-block px-4 py-2 bg-white/80 backdrop-blur-sm text-primary-800 rounded-full text-sm font-bold shadow-sm mb-6 border border-primary-200">
-                            🕉️ अन्न हे पूर्णब्रह्म (Ann He Purnabrahma)
+                        <span className="inline-block px-4 py-1.5 rounded-full border border-primary-200/60 bg-gradient-to-r from-primary-50 to-white text-primary-700 text-xs font-bold tracking-[0.2em] uppercase mb-6 shadow-sm">
+                            Today's Special: {dailyMenu?.special || 'Maharashtrian Thali'}
                         </span>
-                        <h1 className="text-5xl md:text-7xl font-display font-bold text-dark-900 leading-[1.1] mb-6">
-                            Ghar ka Khana, <br />
-                            <span className="text-gradient-gold">Delivered Warm.</span>
+                        <h1 className="text-5xl lg:text-7xl font-display font-bold leading-[1.1] text-dark-900 tracking-tight">
+                            Experience the <br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-500 to-primary-600 drop-shadow-sm">Warmth of Home</span> <br />
+                            Cooking
                         </h1>
-                        <p className="text-xl text-dark-700 mb-8 leading-relaxed font-medium">
-                            Experience the taste of home with Pune's most trusted mess service.
-                            Daily rotating menus, fresh ingredients, and delivered right to your doorstep.
-                        </p>
-
-                        <div className="flex flex-col sm:flex-row gap-4 mb-10">
-                            <Button size="lg" className="shadow-primary-200 shadow-xl border-white hover:border-primary-200">
-                                View Today's Menu <ArrowRight className="ml-2 w-5 h-5" />
-                            </Button>
-                            <Button size="lg" variant="outline" className="bg-white/80 backdrop-blur-sm hover:bg-white border-primary-600 text-primary-700">
-                                Check Plans
-                            </Button>
-                        </div>
-
-                        <div className="flex items-center gap-6 text-sm font-medium text-dark-800 bg-white/60 p-4 rounded-2xl w-fit backdrop-blur-sm">
-                            <div className="flex items-center gap-2">
-                                <CheckCircle className="text-secondary-600 w-5 h-5" /> No Preservatives
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <CheckCircle className="text-secondary-600 w-5 h-5" /> Free Delivery
-                            </div>
-                        </div>
                     </motion.div>
-                </div>
 
-                {/* Image Content */}
-                <div className="relative hidden md:block">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                        className="relative z-10"
+                    <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4, duration: 0.8 }}
+                        className="text-lg md:text-xl text-dark-600 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed tracking-wide"
                     >
-                        {/* Main Focus Image instead of pattern */}
-                        <div className="aspect-square rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white/50 bg-gray-100 relative group rotate-2 hover:rotate-0 transition-all duration-700">
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none z-10" />
-                            <img
-                                src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop"
-                                alt="Delicious Indian Thali"
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                            />
-                        </div>
+                        Elevate your daily dining with our award-winning tiffin service.
+                        Authentic flavors, curated hygiene, and love in every bite.
+                    </motion.p>
 
-                        {/* Floating Ratings Card */}
-                        <motion.div
-                            initial={{ x: 50, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.6 }}
-                            className="absolute -bottom-4 -left-4 bg-white/90 backdrop-blur-md p-4 rounded-xl shadow-xl border border-white flex items-center gap-4"
-                        >
-                            <div className="bg-primary-100 p-3 rounded-full text-2xl">😋</div>
-                            <div>
-                                <div className="font-bold text-dark-900">4.9/5 Rating</div>
-                                <div className="text-xs text-gray-500">Based on 1200+ Reviews</div>
-                            </div>
-                        </motion.div>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.6, duration: 0.8 }}
+                        className="flex flex-col sm:flex-row items-center gap-6 justify-center lg:justify-start"
+                    >
+                        <Button size="lg" className="bg-primary-500 hover:bg-primary-600 text-white border-none px-10 text-lg w-full sm:w-auto font-bold shadow-xl shadow-primary-500/20 hover:shadow-primary-500/30 hover:-translate-y-1">
+                            View Menu <ArrowRight className="ml-2 w-5 h-5" />
+                        </Button>
+                        <Button size="lg" variant="outline" className="border-2 border-dark-200 hover:border-dark-300 text-dark-700 hover:bg-white w-full sm:w-auto font-bold hover:text-dark-900">
+                            Our Plans
+                        </Button>
                     </motion.div>
-                </div>
 
+                    {/* Trust Indicators */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.8 }}
+                        className="pt-10 flex items-center justify-center lg:justify-start gap-12 border-t border-dark-100/60"
+                    >
+                        <div>
+                            <p className="text-4xl font-display font-bold text-dark-900">5k+</p>
+                            <p className="text-dark-400 text-xs uppercase tracking-widest font-bold mt-1">Meals Served</p>
+                        </div>
+                        <div className="w-px h-12 bg-dark-200/50"></div>
+                        <div>
+                            <p className="text-4xl font-display font-bold text-primary-500">4.9</p>
+                            <p className="text-dark-400 text-xs uppercase tracking-widest font-bold mt-1">User Rating</p>
+                        </div>
+                    </motion.div>
+                </motion.div>
+
+                {/* Right Visual composition */}
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                    className="relative hidden lg:block h-[600px] w-full perspective-1000"
+                >
+                    {/* Abstract Composition */}
+                    <motion.div
+                        animate={{ y: [0, -20, 0] }}
+                        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute inset-0 bg-gradient-to-tr from-primary-100/30 to-transparent rounded-[2.5rem] border border-white/60 shadow-2xl backdrop-blur-sm"
+                    />
+
+                    {/* Floating Glass Cards */}
+                    <motion.div
+                        animate={{ y: [0, -15, 0], rotate: [0, 1, 0] }}
+                        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                        className="absolute top-12 right-12 w-80 min-h-[400px] bg-white rounded-3xl p-5 flex flex-col justify-between z-20 group shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-gray-100"
+                    >
+                        <div className="h-64 rounded-2xl overflow-hidden relative shadow-md group-hover:shadow-lg transition-all duration-500">
+                            {/* Network Image or Fallback */}
+                            <img
+                                src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=800&auto=format&fit=crop"
+                                alt="Royal Thali"
+                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-60"></div>
+                            <div className="absolute bottom-4 left-4">
+                                <span className="px-3 py-1.5 bg-white/95 backdrop-blur text-primary-700 text-[10px] font-extrabold tracking-widest uppercase rounded-lg shadow-sm">Bestseller</span>
+                            </div>
+                        </div>
+                        <div className="mt-5 px-1">
+                            <h3 className="text-2xl font-display text-dark-900 font-bold mb-1">Royal Thali</h3>
+                            <div className="flex justify-between items-baseline">
+                                <p className="text-primary-600 font-bold text-xl">₹150</p>
+                                <span className="text-xs text-gray-400 font-bold uppercase tracking-wide">Per Meal</span>
+                            </div>
+                        </div>
+                    </motion.div>
+
+                    <motion.div
+                        animate={{ y: [0, 20, 0], rotate: [0, -1, 0] }}
+                        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                        className="absolute bottom-16 left-8 w-72 bg-white rounded-2xl p-6 flex flex-col z-30 shadow-[0_15px_40px_rgba(0,0,0,0.08)] border border-gray-100"
+                    >
+                        <div className="flex items-center gap-4 mb-4">
+                            <div className="w-12 h-12 rounded-full bg-secondary-50 text-secondary-600 flex items-center justify-center font-bold border border-secondary-100 shadow-sm">
+                                V
+                            </div>
+                            <div>
+                                <h4 className="text-lg font-bold text-dark-900 leading-tight">Pure Veg</h4>
+                                <p className="text-gray-400 text-xs font-bold uppercase tracking-wide">Sattvic Prep</p>
+                            </div>
+                        </div>
+                        <p className="text-dark-600 text-sm leading-relaxed italic font-medium">
+                            "The paneer butter masala is absolutely divine! Reminds me of mom's cooking."
+                        </p>
+                    </motion.div>
+                </motion.div>
             </div>
+
+            {/* Scroll Indicator */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.5, duration: 1 }}
+                className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
+            >
+                <div className="w-[1.5px] h-16 bg-gradient-to-b from-primary-300 via-primary-200 to-transparent rounded-full"></div>
+                <span className="text-[10px] text-primary-400 tracking-[0.3em] uppercase font-bold animate-pulse">Scroll</span>
+            </motion.div>
         </section>
     );
 };

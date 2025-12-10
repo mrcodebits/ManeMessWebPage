@@ -96,7 +96,7 @@ const WeeklyMenu = () => {
     const [activeDay, setActiveDay] = useState('Monday');
 
     return (
-        <section className="py-20 bg-primary-50/20" id="menu">
+        <section className="py-24 relative z-10" id="menu">
             <div className="container mx-auto px-6">
                 <SectionHeading
                     title="What's Cooking This Week?"
@@ -104,14 +104,14 @@ const WeeklyMenu = () => {
                 />
 
                 {/* Days Navigation */}
-                <div className="flex flex-wrap justify-center gap-2 mb-12">
+                <div className="flex flex-wrap justify-center gap-2 mb-16">
                     {days.map((day) => (
                         <button
                             key={day}
                             onClick={() => setActiveDay(day)}
-                            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${activeDay === day
-                                    ? 'bg-primary-600 text-white shadow-lg scale-105'
-                                    : 'bg-white text-dark-600 hover:bg-primary-50 border border-transparent hover:border-primary-100'
+                            className={`px-6 py-3 rounded-full text-sm font-bold transition-all duration-300 border ${activeDay === day
+                                ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30 border-primary-500 scale-105 active:scale-95'
+                                : 'bg-white text-dark-500 hover:bg-white hover:text-primary-600 hover:border-primary-200 hover:shadow-md active:scale-95'
                                 }`}
                         >
                             {day}
@@ -123,10 +123,10 @@ const WeeklyMenu = () => {
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={activeDay}
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.3 }}
+                        exit={{ opacity: 0, y: -30 }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
                         className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto"
                     >
                         {/* Lunch Card */}
@@ -134,7 +134,7 @@ const WeeklyMenu = () => {
                             title="Lunch"
                             time="12:00 PM - 2:30 PM"
                             data={menuData[activeDay].Lunch}
-                            icon={<Star className="w-5 h-5 text-yellow-500" />}
+                            icon={<Star className="w-5 h-5 text-primary-500" />}
                         />
 
                         {/* Dinner Card */}
@@ -148,7 +148,7 @@ const WeeklyMenu = () => {
                 </AnimatePresence>
 
                 <div className="text-center mt-12">
-                    <p className="text-gray-500 text-sm">
+                    <p className="text-dark-400 text-sm italic font-medium">
                         * Menu is subject to minor changes based on seasonal vegetable availability.
                     </p>
                 </div>
@@ -158,36 +158,36 @@ const WeeklyMenu = () => {
 };
 
 const MenuCard = ({ title, time, data, icon }) => (
-    <div className="glass rounded-3xl p-8 card-hover relative overflow-hidden group border-white/50">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary-100/50 to-transparent rounded-bl-full -z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    <div className="bg-white p-8 rounded-[2rem] relative overflow-hidden group border border-dark-100 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.12)] transition-all duration-300 hover:-translate-y-1">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary-50 rounded-bl-full -z-0 transition-opacity duration-500" />
 
         <div className="relative z-10">
-            <div className="flex justify-between items-start mb-6">
+            <div className="flex justify-between items-start mb-8">
                 <div>
-                    <h3 className="text-2xl font-display font-bold text-dark-900 flex items-center gap-2">
+                    <h3 className="text-3xl font-display font-bold text-dark-900 flex items-center gap-3">
                         {title} {icon}
                     </h3>
-                    <p className="text-dark-500 flex items-center gap-1 text-sm mt-1">
-                        <Clock className="w-4 h-4" /> {time}
+                    <p className="text-dark-500 flex items-center gap-2 text-sm mt-2 font-medium">
+                        <Clock className="w-4 h-4 text-primary-400" /> {time}
                     </p>
                 </div>
-                <span className="bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                <span className="bg-primary-50 border border-primary-100 text-primary-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
                     {data.calories}
                 </span>
             </div>
 
-            <div className="space-y-3 mb-6">
+            <div className="space-y-4 mb-8">
                 {data.items.map((item, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                        <div className="w-1.5 h-1.5 rounded-full bg-secondary-500" />
-                        <span className="text-dark-700 font-medium">{item}</span>
+                    <div key={index} className="flex items-center gap-4 group/item">
+                        <div className="w-2 h-2 rounded-full bg-primary-400 group-hover/item:scale-125 transition-transform" />
+                        <span className="text-dark-700 font-medium tracking-wide">{item}</span>
                     </div>
                 ))}
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
                 {data.tags.map((tag, idx) => (
-                    <span key={idx} className="text-xs font-bold text-dark-500 bg-white/50 border border-gray-100 px-2 py-1 rounded-md">
+                    <span key={idx} className="text-[10px] font-bold text-dark-500 bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-lg uppercase tracking-wider hover:bg-primary-50 hover:text-primary-700 transition-colors">
                         #{tag}
                     </span>
                 ))}

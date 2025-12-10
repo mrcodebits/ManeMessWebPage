@@ -1,21 +1,25 @@
 import SectionHeading from '../ui/SectionHeading';
 import Button from '../ui/Button';
 import { MapPin, Phone, Mail } from 'lucide-react';
+import { motion } from 'framer-motion';
 
-const ContactInfoCard = ({ icon, title, info, subInfo, color }) => (
-    <div className="p-6 rounded-3xl bg-white shadow-xl shadow-gray-100 border border-gray-100 text-center hover:-translate-y-2 transition-transform duration-300">
-        <div className={`${color} w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg rotate-3 text-white`}>
+const ContactInfoCard = ({ icon, title, info, subInfo }) => (
+    <motion.div
+        whileHover={{ y: -5 }}
+        className="p-8 rounded-3xl bg-white text-center border border-dark-100 shadow-xl hover:shadow-2xl hover:border-primary-200 transition-all"
+    >
+        <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-6 bg-primary-50 text-primary-500 border border-primary-100">
             {icon}
         </div>
-        <h3 className="text-lg font-bold text-dark-900 mb-1">{title}</h3>
-        <p className="text-base font-medium text-primary-600 mb-1">{info}</p>
-        <p className="text-xs text-gray-400">{subInfo}</p>
-    </div>
+        <h3 className="text-lg font-bold text-dark-900 mb-2 font-display">{title}</h3>
+        <p className="text-base font-medium text-dark-600 mb-1">{info}</p>
+        <p className="text-xs text-dark-400 uppercase tracking-widest">{subInfo}</p>
+    </motion.div>
 );
 
 const ContactSection = () => {
     return (
-        <section className="py-20 bg-white" id="contact">
+        <section className="py-24 relative z-10" id="contact">
             <div className="container mx-auto px-6">
                 <SectionHeading
                     title="Ready to Taste?"
@@ -23,71 +27,75 @@ const ContactSection = () => {
                     centered={true}
                 />
 
-                <div className="grid md:grid-cols-3 gap-6 mb-16 max-w-4xl mx-auto">
+                <div className="grid md:grid-cols-3 gap-6 mb-20 max-w-4xl mx-auto">
                     <ContactInfoCard
-                        icon={<Phone size={20} />}
+                        icon={<Phone size={24} />}
                         title="Call Us"
                         info="+91 98765 43210"
                         subInfo="Mon-Sat, 9am - 7pm"
-                        color="bg-primary-500"
                     />
                     <ContactInfoCard
-                        icon={<Mail size={20} />}
+                        icon={<Mail size={24} />}
                         title="Email Us"
                         info="hello@manemess.com"
                         subInfo="We reply within 24hrs"
-                        color="bg-secondary-500"
                     />
                     <ContactInfoCard
-                        icon={<MapPin size={20} />}
+                        icon={<MapPin size={24} />}
                         title="Visit Kitchen"
                         info="Hingne Home Colony"
                         subInfo="Karvenagar, Pune 411052"
-                        color="bg-primary-600"
                     />
                 </div>
 
-                <div className="bg-primary-50 rounded-3xl p-8 md:p-12 overflow-hidden relative max-w-5xl mx-auto">
-                    {/* Background decoration */}
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary-100 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                <div className="bg-white p-1 rounded-[2.5rem] max-w-5xl mx-auto shadow-2xl relative overflow-hidden border border-white/40">
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-primary-200/50 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 -z-10" />
 
-                    <div className="grid md:grid-cols-2 gap-12 relative z-10 items-center">
-                        <div>
-                            <h3 className="text-3xl font-display font-bold text-dark-900 mb-4">Book a 2-Day Trial</h3>
-                            <p className="text-dark-600 mb-8 text-lg">
-                                Not sure? Try us for 2 days! We serve trials in Karvenagar, Kothrud, and Warje.
-                                <br /><br />
-                                Simple, home-cooked food that speaks for itself.
-                            </p>
-                        </div>
+                    <div className="bg-white/90 backdrop-blur-3xl rounded-[2.3rem] p-8 md:p-14 border border-dark-50">
+                        <div className="grid md:grid-cols-2 gap-16 items-center">
+                            <div>
+                                <h3 className="text-4xl font-display font-bold text-dark-900 mb-6">Book a 2-Day Trial</h3>
+                                <p className="text-dark-600 mb-8 text-lg font-medium leading-relaxed">
+                                    Not sure? Try us for 2 days! We serve trials in Karvenagar, Kothrud, and Warje.
+                                    <br /><br />
+                                    Simple, home-cooked food that speaks for itself.
+                                </p>
+                                <div className="flex gap-4 items-center">
+                                    <div className="h-px flex-grow bg-dark-200" />
+                                    <span className="text-primary-600 text-sm font-bold uppercase tracking-widest">No Commitment</span>
+                                    <div className="h-px flex-grow bg-dark-200" />
+                                </div>
+                            </div>
 
-                        <div className="bg-white rounded-2xl p-8 shadow-lg">
-                            <form className="space-y-4">
+                            <form className="space-y-5">
                                 <div>
-                                    <label className="block text-sm font-medium text-dark-700 mb-1">Full Name</label>
+                                    <label className="block text-xs font-bold text-dark-500 uppercase tracking-wider mb-2">Full Name</label>
                                     <input
                                         type="text"
-                                        className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                                        className="w-full px-5 py-3 rounded-xl bg-dark-50 border border-dark-200 text-dark-900 placeholder-dark-400 focus:outline-none focus:border-primary-500/50 focus:ring-2 focus:ring-primary-100 transition-all font-medium"
                                         placeholder="John Doe"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-dark-700 mb-1">Phone Number</label>
+                                    <label className="block text-xs font-bold text-dark-500 uppercase tracking-wider mb-2">Phone Number</label>
                                     <input
                                         type="tel"
-                                        className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                                        className="w-full px-5 py-3 rounded-xl bg-dark-50 border border-dark-200 text-dark-900 placeholder-dark-400 focus:outline-none focus:border-primary-500/50 focus:ring-2 focus:ring-primary-100 transition-all font-medium"
                                         placeholder="+91 0000000000"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-dark-700 mb-1">Your Area</label>
-                                    <select className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all">
-                                        <option>Karvenagar - Hingne Home Colony</option>
-                                        <option>Kothrud</option>
-                                        <option>Warje</option>
+                                    <label className="block text-xs font-bold text-dark-500 uppercase tracking-wider mb-2">Your Area</label>
+                                    <select className="w-full px-5 py-3 rounded-xl bg-dark-50 border border-dark-200 text-dark-900 focus:outline-none focus:border-primary-500/50 focus:ring-2 focus:ring-primary-100 transition-all font-medium appearance-none">
+                                        <option className="text-gray-400">Select Area</option>
+                                        <option value="karvenagar">Karvenagar - Hingne Home Colony</option>
+                                        <option value="kothrud">Kothrud</option>
+                                        <option value="warje">Warje</option>
                                     </select>
                                 </div>
-                                <Button className="w-full mt-2">Request Call Back</Button>
+                                <Button className="w-full bg-primary-500 text-white hover:bg-primary-600 mt-4 h-12 text-base shadow-lg shadow-primary-500/20 border-none font-bold">
+                                    Request Call Back
+                                </Button>
                             </form>
                         </div>
                     </div>

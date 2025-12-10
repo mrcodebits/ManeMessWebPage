@@ -1,4 +1,5 @@
 import { Facebook, Instagram, Twitter, UtensilsCrossed } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
     const handleScroll = (e, id) => {
@@ -14,14 +15,12 @@ const Footer = () => {
             <div className="container mx-auto px-6">
                 <div className="grid md:grid-cols-4 gap-12 mb-12">
                     <div className="space-y-4">
-                        <a href="#" className="flex items-center gap-2">
-                            <div className="bg-primary-600 p-2 rounded-xl text-white">
-                                <UtensilsCrossed size={20} />
-                            </div>
+                        <Link to="/" className="flex items-center gap-3">
+                            <img src="/images/logo.svg" alt="Mane Mess" className="h-12 w-auto object-contain" />
                             <span className="text-xl font-display font-bold text-dark-900">
                                 Mane <span className="text-primary-600">Mess</span>
                             </span>
-                        </a>
+                        </Link>
                         <p className="text-dark-600 text-sm">
                             Bringing the warmth of home-cooked meals to your doorstep in Pune. Healthy, hygienic, and affordable.
                         </p>
@@ -57,8 +56,9 @@ const Footer = () => {
                     </div>
                 </div>
 
-                <div className="pt-8 border-t border-gray-100 text-center text-sm text-dark-500">
-                    © {new Date().getFullYear()} Mane Mess Service. All rights reserved.
+                <div className="border-t border-dark-800 mt-16 pt-8 text-center text-gray-500">
+                    <p>&copy; {new Date().getFullYear()} Mane Mess. All rights reserved.</p>
+                    <Link to="/admin" className="text-xs text-dark-700 hover:text-primary-500 mt-2 inline-block transition-colors">Admin Login</Link>
                 </div>
             </div>
         </footer>

@@ -7,53 +7,83 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Warm Appetizing Palette
         primary: {
-          50: '#fff8e1',  // Saffron tints
-          100: '#ffecb3',
-          200: '#ffe082',
-          300: '#ffd54f',
-          400: '#ffca28',
-          500: '#ffb300', // Golden Saffron (Base)
-          600: '#fb8c00', // Deep Saffron (Text/Buttons)
-          700: '#e65100', // Royal Orange
-          800: '#ef6c00',
-          900: '#e65100',
+          50: '#FFFBEB',
+          100: '#FEF3C7',
+          200: '#FDE68A',
+          300: '#FCD34D',
+          400: '#FBBF24', // Saffron/Turmeric
+          500: '#F59E0B',
+          600: '#D97706',
+          700: '#B45309', // Burnt Orange
+          800: '#92400E',
+          900: '#78350F',
         },
+        // Freshness/Veg Accents
         secondary: {
-          50: '#fbe9e7',  // Maroon tints
-          100: '#ffccbc',
-          200: '#ffab91',
-          300: '#ff8a65',
-          400: '#ff7043',
-          500: '#d84315',
-          600: '#bf360c',
-          700: '#a31515', // Royal Maroon (Base)
-          800: '#800000', // Deep Maroon
-          900: '#5d0000',
+          50: '#F0FDF4',
+          500: '#22C55E',
+          700: '#15803D',
+          900: '#14532D', // Deep Green
         },
+        // Warm Neutrals (Backgrounds)
         dark: {
-          900: '#1a1a1a',
-          800: '#2a2a2a',
-          700: '#3a3a3a',
+          50: '#FAFAF9', // Warm White
+          100: '#F5F5F4',
+          200: '#E7E5E4',
+          800: '#292524', // Warm Black
+          900: '#1C1917',
+        },
+        // Retain Gold for specific accents but warmer
+        gold: {
+          400: '#FBBF24',
+          500: '#F59E0B',
+        },
+        // Glass Tokens relative to base
+        glass: {
+          100: 'rgba(255, 255, 255, 0.7)', // Frosted White
+          200: 'rgba(255, 255, 255, 0.8)',
+          300: 'rgba(255, 255, 255, 0.9)',
+          dark: 'rgba(28, 25, 23, 0.05)', // Subtle shadow glass
         },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Playfair Display', 'serif'], // For headings to give premium feel
+        display: ['Playfair Display', 'serif'],
+      },
+      backgroundImage: {
+        'noise': "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E\")",
+      },
+      boxShadow: {
+        'glow': '0 0 40px -10px rgba(212, 175, 55, 0.15)',
       },
       animation: {
-        'fade-in': 'fadeIn 0.5s ease-out',
-        'slide-up': 'slideUp 0.5s ease-out',
+        'fade-in': 'fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+        'fade-in-up': 'fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1)',
+        'float': 'float 6s ease-in-out infinite',
+        'slow-zoom': 'slowZoom 20s linear infinite',
       },
       keyframes: {
         fadeIn: {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
         },
-        slideUp: {
-          '0%': { transform: 'translateY(20px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
+        fadeInUp: {
+          '0%': { opacity: '0', transform: 'translateY(40px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-20px)' },
+        },
+        slowZoom: {
+          '0%': { transform: 'scale(1)' },
+          '100%': { transform: 'scale(1.1)' },
+        },
+      },
+      backdropBlur: {
+        xs: '2px',
       },
     },
   },

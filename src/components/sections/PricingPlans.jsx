@@ -1,6 +1,7 @@
 import SectionHeading from '../ui/SectionHeading';
 import Button from '../ui/Button';
-import { Check } from 'lucide-react';
+import { Check, Crown } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const plans = [
     {
@@ -16,7 +17,7 @@ const plans = [
             "No Delivery (Pickup Only)"
         ],
         highlight: false,
-        color: "border-gray-200"
+        delay: 0.1
     },
     {
         name: "Standard Monthly",
@@ -31,7 +32,7 @@ const plans = [
             "Free Delivery within 2km"
         ],
         highlight: true,
-        color: "border-primary-500 ring-2 ring-primary-500 ring-offset-2"
+        delay: 0.2
     },
     {
         name: "Premium Health",
@@ -46,68 +47,88 @@ const plans = [
             "Priority Delivery"
         ],
         highlight: false,
-        color: "border-secondary-500"
+        delay: 0.3
     }
 ];
 
 const PricingPlans = () => {
     return (
-        <section className="py-20 bg-white bg-pattern-royal relative z-10" id="plans">
+        <section className="py-24 relative z-10" id="plans">
             <div className="container mx-auto px-6">
                 <SectionHeading
-                    title="Simple, Honest Pricing"
-                    subtitle="No Hidden Charges"
+                    title="Invest in Your Health"
+                    subtitle="Simple, Transparent Pricing"
                 />
 
-                <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mt-16">
                     {plans.map((plan, index) => (
-                        <div
+                        <motion.div
                             key={index}
-                            className={`relative bg-white/90 backdrop-blur-sm rounded-3xl p-8 card-hover border ${plan.color} flex flex-col`}
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ delay: plan.delay, duration: 0.5 }}
+                            viewport={{ once: true }}
+                            className={`relative rounded-[2rem] p-8 flex flex-col transition-all duration-500 hover:-translate-y-2 border 
+                                ${plan.highlight
+                                    ? 'bg-white border-primary-500 shadow-2xl shadow-primary-500/10 scale-105 z-10'
+                                    : 'bg-white border-dark-100 shadow-xl hover:shadow-2xl hover:border-primary-200'
+                                }`}
                         >
                             {plan.highlight && (
-                                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-primary-600 to-primary-500 text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg shadow-primary-500/30 tracking-wide">
-                                    Most Popular
+                                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary-500 text-white px-6 py-2 rounded-full text-xs font-bold shadow-lg tracking-widest uppercase flex items-center gap-2">
+                                    <Crown size={14} fill="currentColor" /> Most Popular
                                 </div>
                             )}
 
-                            <div className="mb-8 text-center mt-2">
-                                <h3 className="text-xl font-bold text-dark-900 mb-2">{plan.name}</h3>
-                                <p className="text-dark-500 text-sm h-10">{plan.description}</p>
-                                <div className="mt-6 flex items-baseline justify-center">
-                                    <span className="text-4xl font-display font-bold text-dark-900">₹{plan.price}</span>
-                                    <span className="text-dark-500 ml-1">{plan.period}</span>
+                            <div className="mb-8 text-center mt-4">
+                                <h3 className={`text-xl font-bold mb-2 ${plan.highlight ? 'text-primary-600' : 'text-dark-900'}`}>{plan.name}</h3>
+                                <p className="text-dark-500 text-sm h-10 leading-relaxed font-medium">{plan.description}</p>
+                                <div className="mt-8 flex items-baseline justify-center">
+                                    <span className={`text-5xl font-display font-bold ${plan.highlight ? 'text-dark-900' : 'text-dark-800'}`}>₹{plan.price}</span>
+                                    <span className="text-gray-400 ml-2">{plan.period}</span>
                                 </div>
                             </div>
 
-                            <ul className="space-y-4 mb-8 flex-grow">
+                            <ul className="space-y-4 mb-10 flex-grow px-2">
                                 {plan.features.map((feature, idx) => (
-                                    <li key={idx} className="flex items-start gap-3 text-sm text-dark-700">
-                                        <Check className="w-5 h-5 text-secondary-600 shrink-0" />
+                                    <li key={idx} className="flex items-start gap-3 text-sm text-dark-600 font-medium">
+                                        <div className={`mt-0.5 rounded-full p-0.5 ${plan.highlight ? 'bg-primary-100 text-primary-600' : 'bg-gray-100 text-gray-500'}`}>
+                                            <Check className="w-3 h-3" />
+                                        </div>
                                         {feature}
                                     </li>
                                 ))}
                             </ul>
 
                             <Button
-                                variant={plan.highlight ? 'default' : 'outline'}
-                                className="w-full"
+                                className={`w-full py-4 text-sm font-bold tracking-wide rounded-xl transition-all duration-300
+                                    ${plan.highlight
+                                        ? 'bg-primary-500 hover:bg-primary-600 text-white shadow-lg hover:shadow-xl shadow-primary-500/30 hover:-translate-y-0.5'
+                                        : 'bg-white hover:bg-gray-50 text-dark-800 border-2 border-dark-100 hover:border-dark-300 hover:shadow-md'
+                                    }`}
                             >
                                 Choose {plan.name}
                             </Button>
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
 
-                <div className="mt-16 text-center bg-primary-50 rounded-3xl p-8 border border-primary-100 max-w-3xl mx-auto">
-                    <h3 className="text-2xl font-display font-bold text-primary-800 mb-3">🤝 The Mane Family Promise</h3>
-                    <p className="text-dark-700 text-lg">
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                    viewport={{ once: true }}
+                    className="mt-20 text-center bg-white p-10 rounded-[2rem] border border-dark-100 shadow-lg max-w-3xl mx-auto relative overflow-hidden"
+                >
+                    <div className="absolute inset-0 bg-primary-50/50 -z-10" />
+                    <h3 className="text-2xl font-display font-bold text-dark-900 mb-4">🤝 The Mane Family Promise</h3>
+                    <p className="text-dark-600 text-lg italic leading-relaxed">
                         "When you subscribe to Mane Mess, you aren't just a customer number.
                         You become part of our family. If you're sick, tell us, and we'll send you soft Khichdi.
                         If you're celebrating, we'll send an extra sweet."
                     </p>
-                    <div className="mt-4 font-bold text-dark-900">- The Mane Family</div>
-                </div>
+                    <div className="mt-6 font-bold text-primary-600 text-sm uppercase tracking-widest">- The Mane Family</div>
+                </motion.div>
             </div>
         </section>
     );

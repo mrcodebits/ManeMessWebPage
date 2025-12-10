@@ -1,0 +1,45 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper: Check if user is an admin (You can enhance this by checking specific UIDs or claims)
+    // For now, any authenticated user is treated as admin since this is an internal internal app
+    function isAdmin() {
+      return isAuthenticated();
+    }
+
+    // 1. Members/Subscribers
+    // Public: Read-only (if you want members to see their own status, otherwise restrict)
+    // Admin: Full access
+    match /subscribers/{subscriberId} {
+      allow read: if true; // Or restrict to isAdmin() if data is sensitive
+      allow write: if isAdmin();
+    }
+
+    // 2. Daily Menu
+    // Public: Read-only (Everyone needs to see the menu)
+    // Admin: Full access
+    match /dailyMenu/{menuId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 3. Sales/Orders
+    // Public: No access
+    // Admin: Full access
+    match /sales/{saleId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

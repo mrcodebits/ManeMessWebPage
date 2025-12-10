@@ -5,42 +5,63 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    @apply antialiased text-dark-900 bg-dark-50;
   }
 
   body {
-    @apply bg-primary-50/30 text-dark-900 font-sans antialiased;
+    @apply relative overflow-x-hidden min-h-screen font-sans selection:bg-primary-200 selection:text-primary-900;
   }
 
+  /* Typography Defaults */
   h1,
   h2,
   h3,
   h4,
   h5,
   h6 {
-    @apply font-display font-bold tracking-tight;
+    @apply font-display tracking-tight text-dark-900;
   }
 }
 
 @layer utilities {
   .text-gradient-gold {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-700 via-primary-500 to-primary-700;
-  }
-
-  .bg-pattern-royal {
-    background-image: radial-gradient(#e65100 0.5px, transparent 0.5px), radial-gradient(#e65100 0.5px, #fff8e1 0.5px);
-    background-size: 20px 20px;
-    background-position: 0 0, 10px 10px;
-    opacity: 0.15;
+    @apply text-primary-600;
+    /* Simplification for readability */
   }
 }
 
 @layer components {
-  .glass {
-    @apply bg-white/95 backdrop-blur-xl border border-white/40 shadow-xl;
-    /* Increased opacity from 80 to 95 for better visibility */
+
+  /* Premium Light Glass Effect */
+  .glass-panel {
+    @apply bg-glass-100 backdrop-blur-xl border border-white/50 shadow-xl;
   }
 
-  .card-hover {
-    @apply transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary-500/20;
+  /* This was dark, now mapping to a light card style for compatibility */
+  .glass-panel-dark {
+    @apply bg-white/80 backdrop-blur-md border border-dark-200/50 shadow-lg text-dark-900;
+  }
+
+  /* Interactive Cards */
+  .glass-card {
+    @apply relative overflow-hidden rounded-2xl transition-all duration-500 bg-white border border-dark-100 hover:border-primary-400/50 hover:shadow-glow hover:-translate-y-1;
+  }
+
+  /* Noise Overlay - Keeping it subtle for texture */
+  .bg-noise-overlay {
+    @apply fixed inset-0 w-full h-full pointer-events-none opacity-[0.4] z-[9999] bg-repeat bg-noise mix-blend-overlay;
+  }
+
+  /* Scrollbar Customization */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-dark-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary-300 hover:bg-primary-500 rounded-full transition-colors;
   }
 }
