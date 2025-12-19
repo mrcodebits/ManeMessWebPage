@@ -17,23 +17,11 @@ export const ASSETS = {
     // Team Members
     team: [
         {
-            name: "Sunita Maus",
-            role: "Head Chef",
-            image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=600&auto=format&fit=crop",
-            quote: "Cooking for you is like cooking for my own children."
-        },
-        {
-            name: "Raju Bhau",
-            role: "Delivery Captain",
+            name: "Parmeshawar Mane",
+            role: "Head Chef(owner)",
             image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=600&auto=format&fit=crop",
             quote: "Rain or shine, your dabba will reach on time."
-        },
-        {
-            name: "Vimal Kaku",
-            role: "Spices Expert",
-            image: "https://images.unsplash.com/photo-1554151228-14d9def656ec?q=80&w=600&auto=format&fit=crop",
-            quote: "I grind fresh masalas daily. No packets here."
-        }
+        }, 
     ],
     // Gallery
     gallery: [

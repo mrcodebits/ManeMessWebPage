@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://manemess.com/sitemap.xml

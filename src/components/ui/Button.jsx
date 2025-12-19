@@ -30,10 +30,11 @@ const Button = React.forwardRef(({
     return (
         <motion.button
             ref={ref}
-            whileHover={{ y: -2 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ y: -2, scale: 1.02 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 400, damping: 10 }}
             className={cn(
-                "inline-flex items-center justify-center rounded-full transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:pointer-events-none font-medium",
+                "inline-flex items-center justify-center rounded-full transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:opacity-50 disabled:pointer-events-none font-medium z-10",
                 variants[variant],
                 sizes[size],
                 className

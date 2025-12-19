@@ -13,6 +13,8 @@ import POSModule from '../../components/admin/POSModule';
 import MenuManager from '../../components/admin/MenuManager';
 import SubscriberCRM from '../../components/admin/SubscriberCRM';
 import AdminNotepad from '../../components/admin/AdminNotepad';
+import PlanSettings from '../../components/admin/PlanSettings';
+import PasswordVerifyModal from '../../components/admin/PasswordVerifyModal';
 
 const DashboardOverview = () => {
     const { subscribers, sales, dailyMenu, addSubscriber, updateMenu } = useAdmin();
@@ -94,7 +96,7 @@ const DashboardOverview = () => {
             </motion.header>
 
             {/* Quick Stats Grid */}
-            <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                     <div className="text-gray-500 text-sm mb-1">Active Members</div>
                     <div className="text-3xl font-bold text-primary-600">{activeSubscribers}</div>
@@ -105,7 +107,7 @@ const DashboardOverview = () => {
                 </div>
 
                 {/* Consumption Stats Card (New) */}
-                <div className="bg-orange-50 p-6 rounded-2xl shadow-sm border border-orange-100 col-span-2">
+                <div className="bg-orange-50 p-6 rounded-2xl shadow-sm border border-orange-100 col-span-1 md:col-span-2">
                     <div className="text-orange-800 text-sm mb-3 font-bold flex justify-between items-center">
                         <span>Kitchen Report (Today)</span>
                         <span className="bg-orange-200 px-2 py-0.5 rounded text-xs text-orange-900">{new Date().toLocaleDateString('en-IN')}</span>
@@ -125,14 +127,14 @@ const DashboardOverview = () => {
                 </div>
             </motion.div>
 
-            <motion.div variants={itemVariants} className="grid md:grid-cols-3 gap-8">
+            <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Notepad (New) */}
-                <div className="md:col-span-1 h-full min-h-[300px]">
+                <div className="lg:col-span-1 h-full min-h-[300px]">
                     <AdminNotepad />
                 </div>
 
                 {/* Yearly Analysis & Menu Preview (Existing) */}
-                <div className="md:col-span-2 space-y-6">
+                <div className="lg:col-span-2 space-y-6">
                     <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                         <h3 className="font-bold text-lg mb-4 text-dark-900">Yearly Overview ({currentYear})</h3>
                         {/* Simplified Yearly View for space */}
@@ -200,6 +202,34 @@ const AdminPage = () => {
     const handleLogout = async () => {
         await signOut(auth);
         navigate('/');
+    };
+
+
+
+    // --- Security Logic ---
+    const [showVerify, setShowVerify] = useState(false);
+    const [pendingTab, setPendingTab] = useState('');
+    // Note: We don't store 'isUnlocked' state because user requested "everytime".
+    // So we just allow entry once upon success, but switching away triggers lock again effectively by virtue of this interception.
+    // Actually, "everytime user tries to access settings" means if I am on Dashboard and click Settings -> Verify.
+    // If I switch to POS and back to Settings -> Verify again.
+    // So we just intercept the tab switch to 'settings'.
+
+    const handleTabChange = (tabId) => {
+        if (tabId === 'settings') {
+            setPendingTab(tabId);
+            setShowVerify(true);
+        } else {
+            setActiveTab(tabId);
+        }
+    };
+
+    const handleVerifySuccess = () => {
+        setShowVerify(false);
+        if (pendingTab) {
+            setActiveTab(pendingTab);
+            setPendingTab('');
+        }
     };
 
     if (loading) return (
@@ -295,7 +325,14 @@ const AdminPage = () => {
 
     return (
         <AdminProvider>
-            <AdminLayout activeTab={activeTab} setActiveTab={setActiveTab} onLogout={handleLogout}>
+            <AdminLayout activeTab={activeTab} setActiveTab={handleTabChange} onLogout={handleLogout}>
+                <PasswordVerifyModal
+                    isOpen={showVerify}
+                    onClose={() => { setShowVerify(false); setPendingTab(''); }}
+                    onSuccess={handleVerifySuccess}
+                    title="Restricted Access"
+                    message="Please verify your identity to access Settings."
+                />
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={activeTab}
@@ -309,6 +346,7 @@ const AdminPage = () => {
                         {activeTab === 'pos' && <POSModule />}
                         {activeTab === 'subscribers' && <SubscriberCRM />}
                         {activeTab === 'menu' && <MenuManager />}
+                        {activeTab === 'settings' && <PlanSettings />}
                     </motion.div>
                 </AnimatePresence>
             </AdminLayout>

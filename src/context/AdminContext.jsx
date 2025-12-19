@@ -17,6 +17,7 @@ export const AdminProvider = ({ children }) => {
     });
     const [sales, setSales] = useState([]);
     const [adminNotes, setAdminNotes] = useState('');
+    const [planSettings, setPlanSettings] = useState(PLAN_TYPES); // Dynamic Plans
 
     // --- Mock Data Fallback (Initial) ---
     const [mockSubscribers, setMockSubscribers] = useState([
@@ -73,6 +74,7 @@ export const AdminProvider = ({ children }) => {
     }, []);
 
     // --- Firebase Listeners ---
+    // --- Firebase Listeners ---
     useEffect(() => {
         if (!useFirebase) return;
         const unsubSub = onSnapshot(collection(db, 'subscribers'), (snapshot) => {
@@ -91,7 +93,13 @@ export const AdminProvider = ({ children }) => {
         const unsubNotes = onSnapshot(doc(db, 'settings', 'adminNotes'), (docSnap) => {
             if (docSnap.exists()) setAdminNotes(docSnap.data().content || '');
         });
-        return () => { unsubSub(); unsubMenu(); unsubSales(); unsubNotes(); };
+        const unsubPlans = onSnapshot(doc(db, 'settings', 'planPrices'), (docSnap) => {
+            if (docSnap.exists()) {
+                // Merge with default to ensure structural integrity
+                setPlanSettings(prev => ({ ...prev, ...docSnap.data() }));
+            }
+        });
+        return () => { unsubSub(); unsubMenu(); unsubSales(); unsubNotes(); unsubPlans(); };
     }, [useFirebase]);
 
 
@@ -124,7 +132,8 @@ export const AdminProvider = ({ children }) => {
     };
 
     // 2. Renew / Change Subscription
-    const renewSubscription = async (id, newPlanId) => {
+    // 2. Renew / Change Subscription
+    const renewSubscription = async (id, newPlanId, financialDetails) => {
         const sub = subscribers.find(s => s.id === id);
         if (!sub) return;
 
@@ -134,30 +143,29 @@ export const AdminProvider = ({ children }) => {
             return;
         }
 
-        // Calculate carry-over logic
-        // 1. Calculate remaining tokens of OLD plan
-        const tokensLeft = (sub.totalTokens || 0) - (sub.tokensUsed || 0);
-        let carryOverTokens = 0;
+        const now = new Date();
+        const renewalEvent = {
+            date: now.toISOString(),
+            type: 'RENEWAL',
+            oldPlanName: sub.planName || 'Unknown',
+            newPlanName: newPlan.name,
+            amountPaid: financialDetails?.netPayable || 0,
+            creditApplied: financialDetails?.creditValue || 0,
+            tokensAdded: financialDetails?.newTotalTokens || 0
+        };
 
-        // 2. If existing plan is valid and has tokens, calculate value
-        if (sub.status !== 'Expired' && tokensLeft > 0 && sub.planId) {
-            const remainingValue = calculateRemainingValue(sub.planId, tokensLeft, sub.totalTokens);
-            // 3. Convert value to NEW plan tokens
-            carryOverTokens = calculateNewTokensFromValue(newPlanId, remainingValue);
-            console.log(`Plan Change: Value ₹${remainingValue} converted to ${carryOverTokens} tokens of ${newPlan.name}`);
-        }
-
-        // 4. Base tokens for new plan (Standard 30 days * meals per day)
-        const baseTokens = newPlan.mealsPerDay * 30;
-        const totalNewTokens = baseTokens + carryOverTokens;
+        const renewalHistory = [...(sub.renewalHistory || []), renewalEvent];
 
         const updateData = {
             status: 'Active',
             tokensUsed: 0,
-            totalTokens: totalNewTokens,
+            totalTokens: financialDetails?.newTotalTokens || (newPlan.mealsPerDay * 30),
             planId: newPlan.id,
             planName: newPlan.name,
-            startDate: new Date().toLocaleDateString('en-IN')
+            subscriptionPrice: newPlan.basePrice, // SNAPSHOT: Lock in the price for this term
+            startDate: now.toLocaleDateString('en-IN'),
+            renewalHistory, // Append new history
+            uniqueId: sub.uniqueId // Ensure ID persists
         };
 
         if (useFirebase) {
@@ -165,12 +173,25 @@ export const AdminProvider = ({ children }) => {
         } else {
             setSubscribers(prev => prev.map(s => s.id === id ? { ...s, ...updateData } : s));
         }
+
+        // Optional: Auto-log a Sale record for the payment
+        if (financialDetails?.netPayable > 0) {
+            addSale({
+                items: [{ name: `RENEWAL: ${newPlan.name}`, qty: 1, price: financialDetails.netPayable }],
+                total: financialDetails.netPayable,
+                timestamp: now.toISOString(),
+                type: 'SUBSCRIPTION',
+                subscriberId: id,
+                subscriberName: sub.name
+            });
+        }
     };
 
     // 3. Add Subscriber
     const addSubscriber = async (memberData) => {
         // memberData should contain { name, phone, planId }
-        const plan = Object.values(PLAN_TYPES).find(p => p.id === memberData.planId);
+        // Use Dynamic planSettings instead of static PLAN_TYPES
+        const plan = Object.values(planSettings).find(p => p.id === memberData.planId);
         if (!plan) return;
 
         // Generate Unique ID (Simple logic: Count + 1)
@@ -184,6 +205,7 @@ export const AdminProvider = ({ children }) => {
             phone: memberData.phone,
             planId: plan.id,
             planName: plan.name,
+            subscriptionPrice: plan.basePrice, // SNAPSHOT: Lock in the price
             status: 'Active',
             tokensUsed: 0,
             totalTokens: plan.mealsPerDay * 30, // Default 30 days
@@ -225,6 +247,23 @@ export const AdminProvider = ({ children }) => {
         }
     };
 
+    // 7. Update Plan Price
+    const updatePlanPrice = async (planId, newPrice) => {
+        const updatedPlans = {
+            ...planSettings,
+            [planId]: { ...planSettings[planId], basePrice: Number(newPrice) }
+        };
+
+        if (useFirebase) {
+            // We save the entire object to 'settings/planPrices'
+            // Note: In a real app we might update just the field. For now replacing the doc or merging is fine.
+            // We'll use setDoc to merge/overwrite.
+            await setDoc(doc(db, 'settings', 'planPrices'), updatedPlans, { merge: true });
+        } else {
+            setPlanSettings(updatedPlans);
+        }
+    };
+
     return (
         <AdminContext.Provider value={{
             subscribers: useFirebase ? subscribers : mockSubscribers,
@@ -236,7 +275,9 @@ export const AdminProvider = ({ children }) => {
             addSubscriber,
             addSale,
             updateMenu,
-            updateNotes
+            updateNotes,
+            planSettings,
+            updatePlanPrice
         }}>
             {children}
         </AdminContext.Provider>

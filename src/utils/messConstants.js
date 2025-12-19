@@ -98,3 +98,42 @@ export const calculateNewTokensFromValue = (newPlanId, value) => {
 
     return Math.floor(value / pricePerToken);
 };
+
+// Helper: Precise Renewal Calculation
+// Helper: Precise Renewal Calculation
+export const calculateRenewalDetails = (currentSub, newPlanId, latestPlans = PLAN_TYPES) => {
+    // latestPlans allows passing dynamic prices from AdminContext
+    const currentPlan = Object.values(latestPlans).find(p => p.id === currentSub.planId);
+    const newPlan = Object.values(latestPlans).find(p => p.id === newPlanId);
+
+    if (!newPlan) return null;
+
+    let creditValue = 0;
+    const tokensLeft = (currentSub.totalTokens || 0) - (currentSub.tokensUsed || 0);
+
+    // Calculate Credit from Old Plan
+    if (currentPlan && tokensLeft > 0) {
+        // CRITICAL: Use the price the user ACTUALLY paid (subscriptionPrice) if available.
+        // If not (legacy user), fall back to the CURRENT price of their plan (best guess).
+        const planPriceForCredit = currentSub.subscriptionPrice || currentPlan.basePrice;
+
+        // Price per token based on the ORIGINAL total tokens (assuming standard month if not stored)
+        const pricePerToken = planPriceForCredit / (currentSub.totalTokens || (currentPlan.mealsPerDay * 30));
+
+        creditValue = Math.round(tokensLeft * pricePerToken);
+    }
+
+    const newPlanCost = newPlan.basePrice; // Always charge current market rate for NEW plan
+    const netPayable = newPlanCost - creditValue;
+
+    return {
+        creditValue,
+        newPlanCost,
+        netPayable, // Can be negative if downgrading substantially
+        newTotalTokens: newPlan.mealsPerDay * 30, // Standard 30 days
+        tokensLeft,
+        planName: newPlan.name,
+        // Return this so the UI can verify which price was used
+        debug: { usedPrice: currentSub.subscriptionPrice || 'Legacy Fallback' }
+    };
+};

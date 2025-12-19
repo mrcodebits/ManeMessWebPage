@@ -28,6 +28,11 @@
     @apply text-primary-600;
     /* Simplification for readability */
   }
+
+  .mask-linear-fade {
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  }
 }
 
 @layer components {
@@ -58,10 +63,10 @@
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-dark-100;
+    @apply bg-transparent;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-primary-300 hover:bg-primary-500 rounded-full transition-colors;
+    @apply bg-dark-200/60 hover:bg-dark-300 rounded-full transition-colors border-2 border-transparent bg-clip-content;
   }
 }

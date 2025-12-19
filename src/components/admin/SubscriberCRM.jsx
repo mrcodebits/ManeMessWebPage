@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useAdmin } from '../../context/AdminContext';
-import { Plus, RefreshCw, Smartphone, User, IdCard, CalendarCheck } from 'lucide-react';
-import { PLAN_TYPES } from '../../utils/messConstants';
+import { Plus, RefreshCw, Smartphone, User, IdCard, CalendarCheck, Calendar } from 'lucide-react';
+import { PLAN_TYPES, calculateRenewalDetails } from '../../utils/messConstants';
+import CalendarHistoryModal from './CalendarHistoryModal';
+import PasswordVerifyModal from '../../components/admin/PasswordVerifyModal';
 
 const SubscriberCRM = () => {
     const { subscribers, renewSubscription, addSubscriber } = useAdmin();
@@ -19,6 +21,9 @@ const SubscriberCRM = () => {
     // State for Renewal
     const [selectedSubscriber, setSelectedSubscriber] = useState(null);
     const [newPlanForRenewal, setNewPlanForRenewal] = useState(null);
+    const [renewalDetails, setRenewalDetails] = useState(null);
+    const [viewingHistory, setViewingHistory] = useState(null);
+    const [showVerifyModal, setShowVerifyModal] = useState(false);
 
     const [filterType, setFilterType] = useState('ALL');
 
@@ -52,15 +57,33 @@ const SubscriberCRM = () => {
 
     const openRenewModal = (sub) => {
         setSelectedSubscriber(sub);
-        setNewPlanForRenewal(sub.planId || PLAN_TYPES.FULL_TIFFIN_1M.id);
+        const defaultPlanId = sub.planId || PLAN_TYPES.FULL_TIFFIN_1M.id;
+        setNewPlanForRenewal(defaultPlanId);
+        setRenewalDetails(calculateRenewalDetails(sub, defaultPlanId));
         setIsRenewModalOpen(true);
+    };
+
+    const handlePlanChange = (planId) => {
+        setNewPlanForRenewal(planId);
+        if (selectedSubscriber) {
+            setRenewalDetails(calculateRenewalDetails(selectedSubscriber, planId));
+        }
     };
 
     const handleRenewSubmit = (e) => {
         e.preventDefault();
         if (!selectedSubscriber) return;
-        renewSubscription(selectedSubscriber.id, newPlanForRenewal);
+        // Trigger verification instead of immediate renewal
+        setShowVerifyModal(true);
+    };
+
+    const confirmRenewalAfterVerify = () => {
+        if (!selectedSubscriber) return;
+
+        renewSubscription(selectedSubscriber.id, newPlanForRenewal, renewalDetails);
+
         setIsRenewModalOpen(false);
+        setShowVerifyModal(false);
         setSelectedSubscriber(null);
         alert('Plan Renewed/Updated Successfully');
     };
@@ -142,15 +165,38 @@ const SubscriberCRM = () => {
                         <form onSubmit={handleRenewSubmit} className="space-y-4">
                             <div className="bg-blue-50 p-4 rounded-xl text-sm text-blue-800 mb-4">
                                 <strong>Current Status:</strong> {(selectedSubscriber.totalTokens || 0) - (selectedSubscriber.tokensUsed || 0)} Tokens Remaining.<br />
-                                <span className="text-xs opacity-80">Changing plan converts remaining tokens by value.</span>
+                                <span className="text-xs opacity-80">Unused tokens will be credited towards the new plan.</span>
                             </div>
+
+                            {renewalDetails && (
+                                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-2 mb-4">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-500">New Plan Cost:</span>
+                                        <span className="font-bold">₹{renewalDetails.newPlanCost}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-green-600">Credit (Unused Tokens):</span>
+                                        <span className="font-bold text-green-600">- ₹{renewalDetails.creditValue}</span>
+                                    </div>
+                                    <div className="h-px bg-gray-200 my-1"></div>
+                                    <div className="flex justify-between text-base font-bold text-dark-900">
+                                        <span>Net Payable:</span>
+                                        <span>₹{renewalDetails.netPayable}</span>
+                                    </div>
+                                    {renewalDetails.netPayable < 0 && (
+                                        <p className="text-xs text-orange-600 mt-1">
+                                            ⚠️ User has excess credit. Refund ₹{Math.abs(renewalDetails.netPayable)} or adjust manually.
+                                        </p>
+                                    )}
+                                </div>
+                            )}
 
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-1">Select New Plan</label>
                                 <select
                                     className="w-full p-3 border rounded-xl bg-gray-50 outline-none focus:border-primary-500 bg-white"
                                     value={newPlanForRenewal}
-                                    onChange={e => setNewPlanForRenewal(e.target.value)}
+                                    onChange={e => handlePlanChange(e.target.value)}
                                 >
                                     {Object.values(PLAN_TYPES).map(plan => (
                                         <option key={plan.id} value={plan.id}>{plan.name} (₹{plan.basePrice})</option>
@@ -232,16 +278,37 @@ const SubscriberCRM = () => {
                                 {sub.status}
                             </span>
 
-                            <button
-                                onClick={() => openRenewModal(sub)}
-                                className="bg-secondary-600 hover:bg-secondary-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-colors text-xs md:text-sm"
-                            >
-                                <RefreshCw size={14} className="md:w-4 md:h-4" /> Renew
-                            </button>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setViewingHistory(sub)}
+                                    className="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100 transition-colors"
+                                    title="View Calendar History"
+                                >
+                                    <Calendar size={20} className="md:w-5 md:h-5" />
+                                </button>
+                                <button
+                                    onClick={() => openRenewModal(sub)}
+                                    className="bg-secondary-600 hover:bg-secondary-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-colors text-xs md:text-sm"
+                                >
+                                    <RefreshCw size={14} className="md:w-4 md:h-4" /> Renew
+                                </button>
+                            </div>
                         </div>
                     </div>
                 ))}
             </div>
+
+            {viewingHistory && (
+                <CalendarHistoryModal user={viewingHistory} onClose={() => setViewingHistory(null)} />
+            )}
+
+            <PasswordVerifyModal
+                isOpen={showVerifyModal}
+                onClose={() => setShowVerifyModal(false)}
+                onSuccess={confirmRenewalAfterVerify}
+                title="Confirm Renewal"
+                message="This action will process a financial transaction. Please verify your identity."
+            />
         </div>
     );
 };

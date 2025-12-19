@@ -14,7 +14,7 @@ import VideoTour from '../components/sections/VideoTour';
 const HomePage = () => {
     return (
         <div>
-            <SEO title="Home" description="Mane Mess - Premium Homemade Tiffin Service in Pune." />
+            <SEO title="Home" description="Mane Mess - Homemade Tiffin Service in Pune." />
             <Hero />
             {/* Reverting to vertical stack as per user request */}
             <DailySpecial />
