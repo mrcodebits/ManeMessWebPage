@@ -6,6 +6,9 @@ export default {
   ],
   theme: {
     extend: {
+      screens: {
+        'xs': '475px',
+      },
       colors: {
         // Warm Appetizing Palette
         primary: {
@@ -24,6 +27,7 @@ export default {
         secondary: {
           50: '#F0FDF4',
           500: '#22C55E',
+          600: '#16A34A',
           700: '#15803D',
           900: '#14532D', // Deep Green
         },
@@ -32,6 +36,11 @@ export default {
           50: '#FAFAF9', // Warm White
           100: '#F5F5F4',
           200: '#E7E5E4',
+          300: '#D6D3D1',
+          400: '#A8A29E',
+          500: '#78716C',
+          600: '#57534E',
+          700: '#44403C',
           800: '#292524', // Warm Black
           900: '#1C1917',
         },
@@ -57,12 +66,17 @@ export default {
       },
       boxShadow: {
         'glow': '0 0 40px -10px rgba(212, 175, 55, 0.15)',
+        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
       },
       animation: {
         'fade-in': 'fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
         'fade-in-up': 'fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1)',
         'float': 'float 6s ease-in-out infinite',
         'slow-zoom': 'slowZoom 20s linear infinite',
+      },
+      transitionTimingFunction: {
+        'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        'out-circ': 'cubic-bezier(0, 0.55, 0.45, 1)',
       },
       keyframes: {
         fadeIn: {
