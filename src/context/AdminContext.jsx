@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
 import { collection, addDoc, updateDoc, doc, onSnapshot, query, orderBy, setDoc } from 'firebase/firestore';
 import { PLAN_TYPES, CONSTANTS, calculateRemainingValue, calculateNewTokensFromValue, generateMemberId } from '../utils/messConstants';
+import { useToast } from './ToastContext';
 
 const AdminContext = createContext();
 
@@ -9,6 +10,7 @@ export const useAdmin = () => useContext(AdminContext);
 
 export const AdminProvider = ({ children }) => {
     const [useFirebase, setUseFirebase] = useState(false);
+    const toast = useToast();
 
     // --- State ---
     const [subscribers, setSubscribers] = useState([]);
@@ -139,51 +141,57 @@ export const AdminProvider = ({ children }) => {
 
         const newPlan = Object.values(PLAN_TYPES).find(p => p.id === newPlanId);
         if (!newPlan) {
-            alert("Invalid Plan Selected");
+            toast.error("Invalid Plan Selected");
             return;
         }
 
-        const now = new Date();
-        const renewalEvent = {
-            date: now.toISOString(),
-            type: 'RENEWAL',
-            oldPlanName: sub.planName || 'Unknown',
-            newPlanName: newPlan.name,
-            amountPaid: financialDetails?.netPayable || 0,
-            creditApplied: financialDetails?.creditValue || 0,
-            tokensAdded: financialDetails?.newTotalTokens || 0
-        };
+        try {
+            const now = new Date();
+            const renewalEvent = {
+                date: now.toISOString(),
+                type: 'RENEWAL',
+                oldPlanName: sub.planName || 'Unknown',
+                newPlanName: newPlan.name,
+                amountPaid: financialDetails?.netPayable || 0,
+                creditApplied: financialDetails?.creditValue || 0,
+                tokensAdded: financialDetails?.newTotalTokens || 0
+            };
 
-        const renewalHistory = [...(sub.renewalHistory || []), renewalEvent];
+            const renewalHistory = [...(sub.renewalHistory || []), renewalEvent];
 
-        const updateData = {
-            status: 'Active',
-            tokensUsed: 0,
-            totalTokens: financialDetails?.newTotalTokens || (newPlan.mealsPerDay * 30),
-            planId: newPlan.id,
-            planName: newPlan.name,
-            subscriptionPrice: newPlan.basePrice, // SNAPSHOT: Lock in the price for this term
-            startDate: now.toLocaleDateString('en-IN'),
-            renewalHistory, // Append new history
-            uniqueId: sub.uniqueId // Ensure ID persists
-        };
+            const updateData = {
+                status: 'Active',
+                tokensUsed: 0,
+                totalTokens: financialDetails?.newTotalTokens || (newPlan.mealsPerDay * 30),
+                planId: newPlan.id,
+                planName: newPlan.name,
+                subscriptionPrice: newPlan.basePrice, // SNAPSHOT: Lock in the price for this term
+                startDate: now.toLocaleDateString('en-IN'),
+                renewalHistory, // Append new history
+                uniqueId: sub.uniqueId // Ensure ID persists
+            };
 
-        if (useFirebase) {
-            await updateDoc(doc(db, 'subscribers', id), updateData);
-        } else {
-            setSubscribers(prev => prev.map(s => s.id === id ? { ...s, ...updateData } : s));
-        }
+            if (useFirebase) {
+                await updateDoc(doc(db, 'subscribers', id), updateData);
+            } else {
+                setSubscribers(prev => prev.map(s => s.id === id ? { ...s, ...updateData } : s));
+            }
 
-        // Optional: Auto-log a Sale record for the payment
-        if (financialDetails?.netPayable > 0) {
-            addSale({
-                items: [{ name: `RENEWAL: ${newPlan.name}`, qty: 1, price: financialDetails.netPayable }],
-                total: financialDetails.netPayable,
-                timestamp: now.toISOString(),
-                type: 'SUBSCRIPTION',
-                subscriberId: id,
-                subscriberName: sub.name
-            });
+            // Optional: Auto-log a Sale record for the payment
+            if (financialDetails?.netPayable > 0) {
+                addSale({
+                    items: [{ name: `RENEWAL: ${newPlan.name}`, qty: 1, price: financialDetails.netPayable }],
+                    total: financialDetails.netPayable,
+                    timestamp: now.toISOString(),
+                    type: 'SUBSCRIPTION',
+                    subscriberId: id,
+                    subscriberName: sub.name
+                });
+            }
+            toast.success(`Successfully renewed plan for ${sub.name}!`);
+        } catch (error) {
+            console.error("Renewal Error:", error);
+            toast.error("Renewal Failed: " + error.message);
         }
     };
 
@@ -214,9 +222,16 @@ export const AdminProvider = ({ children }) => {
         };
 
         if (useFirebase) {
-            await addDoc(collection(db, 'subscribers'), newMember);
+            try {
+                await addDoc(collection(db, 'subscribers'), newMember);
+                toast.success("New subscriber added successfully!");
+            } catch (error) {
+                console.error("Add Sub Error:", error);
+                toast.error("Failed to add subscriber: " + error.message);
+            }
         } else {
             setSubscribers(prev => [{ ...newMember, id: Date.now() }, ...prev]);
+            toast.success("Dev Mode: Subscriber added locally.");
         }
     };
 
@@ -255,12 +270,16 @@ export const AdminProvider = ({ children }) => {
         };
 
         if (useFirebase) {
-            // We save the entire object to 'settings/planPrices'
-            // Note: In a real app we might update just the field. For now replacing the doc or merging is fine.
-            // We'll use setDoc to merge/overwrite.
-            await setDoc(doc(db, 'settings', 'planPrices'), updatedPlans, { merge: true });
+            try {
+                await setDoc(doc(db, 'settings', 'planPrices'), updatedPlans, { merge: true });
+                toast.success("Plan Price Updated Successfully");
+            } catch (error) {
+                console.error("Plan Update Error:", error);
+                toast.error("Failed to update plan: " + error.message);
+            }
         } else {
             setPlanSettings(updatedPlans);
+            toast.success("Dev Mode: Price updated locally.");
         }
     };
 
