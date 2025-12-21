@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AdminProvider, useAdmin } from '../../context/AdminContext';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useAdmin } from '../../context/AdminContext';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { auth } from '../../lib/firebase';
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
@@ -14,10 +14,14 @@ import MenuManager from '../../components/admin/MenuManager';
 import SubscriberCRM from '../../components/admin/SubscriberCRM';
 import AdminNotepad from '../../components/admin/AdminNotepad';
 import PlanSettings from '../../components/admin/PlanSettings';
+
 import PasswordVerifyModal from '../../components/admin/PasswordVerifyModal';
+import { useToast } from '../../context/ToastContext';
+import useModalBack from '../../hooks/useModalBack';
 
 const DashboardOverview = () => {
     const { subscribers, sales, dailyMenu, addSubscriber, updateMenu } = useAdmin();
+    const toast = useToast();
     const today = new Date().toISOString().split('T')[0];
     const currentYear = new Date().getFullYear();
 
@@ -33,7 +37,7 @@ const DashboardOverview = () => {
                 priceHalf: 80,
                 imageUrl: 'https://images.unsplash.com/photo-1546833999-b9f5816029bd'
             });
-            alert('Database Seeded Successfully! Refresh to see changes.');
+            toast.success('Database Seeded Successfully! Refresh to see changes.');
         }
     };
 
@@ -172,8 +176,15 @@ const DashboardOverview = () => {
 const AdminPage = () => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('dashboard');
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // Controlled by URL
+    const activeTab = searchParams.get('tab') || 'dashboard';
+
+    const setActiveTab = (tab) => {
+        setSearchParams({ tab });
+    };
 
     // Login State
     const [email, setEmail] = useState('');
@@ -209,11 +220,12 @@ const AdminPage = () => {
     // --- Security Logic ---
     const [showVerify, setShowVerify] = useState(false);
     const [pendingTab, setPendingTab] = useState('');
-    // Note: We don't store 'isUnlocked' state because user requested "everytime".
-    // So we just allow entry once upon success, but switching away triggers lock again effectively by virtue of this interception.
-    // Actually, "everytime user tries to access settings" means if I am on Dashboard and click Settings -> Verify.
-    // If I switch to POS and back to Settings -> Verify again.
-    // So we just intercept the tab switch to 'settings'.
+
+    // Modal Back Logic
+    useModalBack(showVerify, () => {
+        setShowVerify(false);
+        setPendingTab('');
+    }, 'verify-modal');
 
     const handleTabChange = (tabId) => {
         if (tabId === 'settings') {
@@ -324,33 +336,31 @@ const AdminPage = () => {
     }
 
     return (
-        <AdminProvider>
-            <AdminLayout activeTab={activeTab} setActiveTab={handleTabChange} onLogout={handleLogout}>
-                <PasswordVerifyModal
-                    isOpen={showVerify}
-                    onClose={() => { setShowVerify(false); setPendingTab(''); }}
-                    onSuccess={handleVerifySuccess}
-                    title="Restricted Access"
-                    message="Please verify your identity to access Settings."
-                />
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={activeTab}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        transition={{ duration: 0.2 }}
-                    >
-                        {activeTab === 'dashboard' && <DashboardOverview />}
-                        {activeTab === 'attendance' && <AttendanceModule />}
-                        {activeTab === 'pos' && <POSModule />}
-                        {activeTab === 'subscribers' && <SubscriberCRM />}
-                        {activeTab === 'menu' && <MenuManager />}
-                        {activeTab === 'settings' && <PlanSettings />}
-                    </motion.div>
-                </AnimatePresence>
-            </AdminLayout>
-        </AdminProvider>
+        <AdminLayout activeTab={activeTab} setActiveTab={handleTabChange} onLogout={handleLogout}>
+            <PasswordVerifyModal
+                isOpen={showVerify}
+                onClose={() => { setShowVerify(false); setPendingTab(''); }}
+                onSuccess={handleVerifySuccess}
+                title="Restricted Access"
+                message="Please verify your identity to access Settings."
+            />
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={activeTab}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.2 }}
+                >
+                    {activeTab === 'dashboard' && <DashboardOverview />}
+                    {activeTab === 'attendance' && <AttendanceModule />}
+                    {activeTab === 'pos' && <POSModule />}
+                    {activeTab === 'subscribers' && <SubscriberCRM />}
+                    {activeTab === 'menu' && <MenuManager />}
+                    {activeTab === 'settings' && <PlanSettings />}
+                </motion.div>
+            </AnimatePresence>
+        </AdminLayout>
     );
 };
 
