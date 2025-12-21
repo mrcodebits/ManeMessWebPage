@@ -4,12 +4,17 @@ import { Plus, RefreshCw, Smartphone, User, IdCard, CalendarCheck, Calendar } fr
 import { PLAN_TYPES, calculateRenewalDetails } from '../../utils/messConstants';
 import CalendarHistoryModal from './CalendarHistoryModal';
 import PasswordVerifyModal from '../../components/admin/PasswordVerifyModal';
+import useModalBack from '../../hooks/useModalBack';
 
 const SubscriberCRM = () => {
     const { subscribers, renewSubscription, addSubscriber } = useAdmin();
     const [searchTerm, setSearchTerm] = useState('');
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isRenewModalOpen, setIsRenewModalOpen] = useState(false);
+
+    // Use Modal Back Hooks
+    useModalBack(isAddModalOpen, () => setIsAddModalOpen(false), 'add-member-modal');
+    useModalBack(isRenewModalOpen, () => setIsRenewModalOpen(false), 'renew-modal');
 
     // State for Add Member
     const [newMember, setNewMember] = useState({
@@ -24,6 +29,10 @@ const SubscriberCRM = () => {
     const [renewalDetails, setRenewalDetails] = useState(null);
     const [viewingHistory, setViewingHistory] = useState(null);
     const [showVerifyModal, setShowVerifyModal] = useState(false);
+
+    useModalBack(showVerifyModal, () => setShowVerifyModal(false), 'crm-verify-modal');
+    // Note: viewingHistory is also a modal (CalendarHistoryModal)
+    useModalBack(!!viewingHistory, () => setViewingHistory(null), 'history-modal');
 
     const [filterType, setFilterType] = useState('ALL');
 
@@ -52,7 +61,6 @@ const SubscriberCRM = () => {
         addSubscriber(newMember);
         setIsAddModalOpen(false);
         setNewMember({ name: '', phone: '', planId: PLAN_TYPES.FULL_TIFFIN_1M.id });
-        alert('Member Added Successfully!');
     };
 
     const openRenewModal = (sub) => {
@@ -85,7 +93,6 @@ const SubscriberCRM = () => {
         setIsRenewModalOpen(false);
         setShowVerifyModal(false);
         setSelectedSubscriber(null);
-        alert('Plan Renewed/Updated Successfully');
     };
 
     return (

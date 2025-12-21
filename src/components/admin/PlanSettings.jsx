@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useAdmin } from '../../context/AdminContext';
+import { useToast } from '../../context/ToastContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Save, AlertTriangle, Edit2, X } from 'lucide-react';
 
 const PlanSettings = () => {
     const { planSettings, updatePlanPrice } = useAdmin();
+    const toast = useToast();
     const [editingId, setEditingId] = useState(null);
     const [tempPrice, setTempPrice] = useState('');
 
@@ -15,7 +17,7 @@ const PlanSettings = () => {
 
     const handleSave = async (planId) => {
         if (!tempPrice || isNaN(tempPrice) || Number(tempPrice) < 0) {
-            alert("Please enter a valid positive price.");
+            toast.error("Please enter a valid positive price.");
             return;
         }
         await updatePlanPrice(planId, tempPrice);

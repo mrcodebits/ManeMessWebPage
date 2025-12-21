@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useAdmin } from '../../context/AdminContext';
+import { useToast } from '../../context/ToastContext';
 import { Save, Image as ImageIcon } from 'lucide-react';
 
 const MenuManager = () => {
     const { dailyMenu, updateMenu } = useAdmin();
+    const toast = useToast();
     const [formData, setFormData] = useState({ ...dailyMenu });
 
     const handleChange = (e) => {
@@ -19,7 +21,7 @@ const MenuManager = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         updateMenu(formData);
-        alert('Menu Updated Successfully!');
+        toast.success('Menu Updated Successfully!');
     };
 
     return (

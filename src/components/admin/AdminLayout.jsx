@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { LayoutDashboard, Users, Utensils, ClipboardList, LogOut, Menu, Settings } from 'lucide-react';
 import LanguageSwitcher from '../common/LanguageSwitcher';
-
-import { useTranslation } from 'react-i18next'; // Added import
+import { useTranslation } from 'react-i18next';
+import useModalBack from '../../hooks/useModalBack';
 
 const AdminLayout = ({ children, activeTab, setActiveTab, onLogout }) => {
-    const { t } = useTranslation(); // Hook initialization
+    const { t } = useTranslation();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    useModalBack(isMobileMenuOpen, () => setIsMobileMenuOpen(false), 'mobile-menu');
 
     const navItems = [
         { id: 'dashboard', label: t('admin_nav.dashboard'), icon: <LayoutDashboard size={20} /> },
